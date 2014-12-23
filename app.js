@@ -1,61 +1,56 @@
 var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
-var routes = require('./routes/index');
-var users = require('./routes/users');
+var mongodb = require('mongodb');
 
 var app = express();
+var BSON = mongodb.BSONPure;
+var db, users, wanted_books, provided_books;
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
+app.use(express.static('front'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(require('stylus').middleware(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/users', users);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+mongodb.MongoClient.connect("mongodb://localhost:3333?safe=true", function(err, database) {
+    db = database;
+    users = db.collection("users");
+    wanted_books = db.collection("wanted_books");
+    provided_books = db.collection("provided_books");
+    app.listen(8080);
 });
 
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
+// 一覧取得
+app.get("/api/users", function(req, res) {
+    users.find().toArray(function(err, items) {
+        res.send(items);
     });
 });
 
+// 個人取得
+app.get("/api/users/:_id", function(req, res) {
+    users.findOne({_id: new BSON.ObjectID(req.params._id)}, function(err, item) {
+        res.send(item);
+    });
+});
 
-module.exports = app;
+// 追加
+app.post("/api/users", function(req, res) {
+    var user = req.body;
+    users.insert(user, function() {
+        res.send("insert");
+    });
+});
+
+// 更新
+app.post("/api/users/:_id", function(req, res) {
+    var user = req.body;
+    delete user._id;
+    users.update({_id: new BSON.ObjectID(req.params._id)}, user, function() {
+        res.send("update");
+    });
+});
+
+// 削除
+app.delete("/api/users/:_id", function(req, res) {
+    users.remove({_id: new BSON.ObjectID(req.params._id)}, function() {
+        res.send("delete");
+    });
+});
