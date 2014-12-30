@@ -24,6 +24,19 @@ app.get("/api/users", function(req, res) {
     });
 });
 
+app.get("/api/wanted_books", function(req, res) {
+    wanted_books.find().toArray(function(err, items) {
+        res.send(items);
+    });
+});
+
+app.get("/api/provided_books", function(req, res) {
+    provided_books.find().toArray(function(err, items) {
+        res.send(items);
+    });
+});
+
+
 // 個人取得
 app.get("/api/users/:_id", function(req, res) {
     users.findOne({_id: new BSON.ObjectID(req.params._id)}, function(err, item) {
