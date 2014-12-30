@@ -80,3 +80,15 @@ app.delete("/api/users/:_id", function(req, res) {
         res.send("delete");
     });
 });
+
+app.delete("/api/wanted_books/:_id", function(req, res) {
+    wanted_books.remove({_id: new BSON.ObjectID(req.params._id)}, function() {
+        res.send("delete");
+    });
+});
+
+app.delete("/api/provided_books/:_id", function(req, res) {
+    provided_books.remove({_id: new BSON.ObjectID(req.params._id)}, function() {
+        res.send("delete");
+    });
+});
