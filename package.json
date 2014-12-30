@@ -14,5 +14,8 @@
     "debug": "~2.0.0",
     "ejs": "~0.8.5",
     "stylus": "0.42.3"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5"
   }
 }
