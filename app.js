@@ -36,7 +36,6 @@ app.get("/api/provided_books", function(req, res) {
     });
 });
 
-
 // 個人取得
 app.get("/api/users/:_id", function(req, res) {
     users.findOne({_id: new BSON.ObjectID(req.params._id)}, function(err, item) {
@@ -48,6 +47,20 @@ app.get("/api/users/:_id", function(req, res) {
 app.post("/api/users", function(req, res) {
     var user = req.body;
     users.insert(user, function() {
+        res.send("insert");
+    });
+});
+
+app.post("/api/wanted_books", function(req, res) {
+    var wanted_book = req.body;
+    wanted_books.insert(wanted_book, function() {
+        res.send("insert");
+    });
+});
+
+app.post("/api/provided_books", function(req, res) {
+    var provided_book = req.body;
+    provided_books.insert(provided_book, function() {
         res.send("insert");
     });
 });
